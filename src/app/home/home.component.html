@@ -1,0 +1,726 @@
+
+
+<!-- Dialog box -->
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true" *ngIf="isurl()">
+  <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+              <svg class="size-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-base font-semibold text-gray-900" id="modal-title">Enter Valid Websocket URL to continue!</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">A Valid Websocket URL is needed to connect the server.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto" (click)="close()">Okay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div style="padding: 10px 25px" class="body">
+   <div style="display:flex;align-items: center; margin-bottom: 0px; padding-bottom: 0px; padding: 0px 55px; gap: 190px;">
+    <div>
+      <div style="background-color:#00b4b4; color: #cdffff;  border-bottom-right-radius: 26px; border-bottom-left-radius: 17px; border-radius: 17px; padding: 0px 10px;  height: 95px;">
+        <h4 style="color:  #cdffff; text-align: center; border-radius: 10px; margin-top: 15px; padding-top: 7px; font-size: 18px;">Request Type</h4>
+        <mat-button-toggle-group name="fontStyle" style="border-radius: 20px; color: #00b4b4; margin-top: -10px;" aria-label="Font Style" [formControl]="selectedToggle">
+          <mat-button-toggle value="Client">Client</mat-button-toggle>
+          <mat-button-toggle value="Server">Server</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    </div>
+  <div>
+
+
+<!-- WSConnection Auth Form -->
+    <!-- <mat-card style="max-width: 700px; margin: auto; padding: 20px; margin-left: 200px;"> -->
+    <div style="display: flex;margin-top: -8px;">
+      <mat-form-field appearance="fill" style="width: 650px;" >
+        <mat-label>Enter Connection URL</mat-label>
+      <input
+        matInput
+        type="url"
+        style="width: 550px; height: 25px; margin-bottom: 0px; font-size: 18px;"
+        #urlInput
+        class="url"
+        (keydown.enter)="connectBtn(urlInput.value)"
+      />
+      </mat-form-field>
+      <div class="connectionauth">
+        <button *ngIf="!connectbtn"
+          (click)="connectBtn(urlInput.value)"
+          id="connect"
+          style="height: 56px; box-shadow: none; border-top-left-radius: 0px; border-bottom-left-radius: 0px; margin-left: -2px;  background-color: #009c9c; color:#cdffff ;  box-shadow: none;"
+          mat-fab extended
+        >
+          Connect
+        </button>
+        <button *ngIf="connectbtn"
+        (click)="disconnect()"
+        id="disconnect"
+        style="height: 56px; box-shadow: none; border-top-left-radius: 0px; border-bottom-left-radius: 0px; margin-left: -2px; background-color: #009c9c; color:#cdffff ;  box-shadow: none;"
+        mat-fab extended
+      >
+        Disconnect
+      </button>
+      </div>
+
+      </div>
+      <mat-progress-bar *ngIf="connect" mode="indeterminate"></mat-progress-bar>
+      <p id="dynamic-paragraph" class="para" style="margin-top: 5px; margin-bottom: 0px;"></p>
+  <!-- </mat-card> -->
+</div>
+</div>
+
+<!-- Client Request Side -->
+  <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; margin-top: 10px;" class="main" *ngIf="Client">
+    <div style="display: flex; gap: 20px; width: 100%">
+      <mat-card style="max-width: 700px; margin: auto; padding: 10px; margin-top: 15px; height: 480px;" class="trans">
+      <!-- Column 1: Controls -->
+      <div
+        class="controls-section"
+        style="flex: 1; padding: 15px"
+      >
+        <h2 style="color: #00b4b4; text-decoration: overline;">Controls</h2>
+        <ul
+          style="
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+          "
+        >
+          <li><button  (click)="auth()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Authorize</button></li>
+          <li><button (click)="bootNotification()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Boot Notification</button></li>
+          <li><button (click)="datatrans()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Data Transfer</button></li>
+          <li><button (click)="diagnostics()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Diagnostics Status</button></li>
+          <li><button (click)="firmware()" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px;">Firmware Status</button></li>
+          <li><button (click)="Heartbeatreq()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">HeartBeat</button></li>
+          <li><button (click)="meter_values()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Meter Values</button></li>
+          <li><button (click)="start_transaction()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Start Transaction</button></li>
+          <li><button (click)="status_notification()" mat-fab extended style="height: 30px;  background-color: #cdffff;; color: #009c9c; width: 200px; font-size: 15px;">Status Notification</button></li>
+          <li><button (click)="stop_transaction()" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px;">Stop Transaction</button></li>
+        </ul>
+      </div>
+      </mat-card>
+
+      <mat-card style=" padding: 10px; height: 480px; width: 300px; margin-top: 15px;">
+      <!-- Column 2: Configuration -->
+      <div class="configuration-section "
+        style="flex: 1; padding: 20px"
+      >
+
+        <h2 style="color: #00b4b4; text-decoration: overline;" *ngIf="configuration()==''">Configuration</h2>
+        <h2 style="color: #00b4b4; text-decoration: overline;" *ngIf="configuration()!=''">{{configuration()}}</h2>
+
+
+
+        <div class="auth" >
+          <div id="dropdown-container" class="drop">
+
+
+
+    <!-- Dynamic inputs will be appended here -->
+    </div>
+    <div class="container" *ngIf="isAuth">
+
+
+    </div>
+
+    </div>
+
+
+      <div>
+        <ng-container
+          *ngIf="
+            isFormVisible ||
+            isdiagVisible ||
+            isfirmware ||
+            ismetervalue ||
+            istart ||
+            istatus ||
+            istop || isdata
+          "
+        >
+
+
+          <!-- Boot Notification -->
+          <div *ngIf="isFormVisible">
+            <div>
+              <input
+                class="d-input"
+                type="text"
+                placeholder="ChargePointModel"
+                #model
+                style="width: 229px;"
+              />
+            </div>
+            <div>
+              <input
+                class="d-input"
+                type="text"
+                placeholder="ChargePointVendor"
+                #vendor
+                style="width: 229px;"
+              />
+            </div>
+            <button (click)="boot(model.value, vendor.value)" class="btn">Submit</button>
+          </div>
+        <!-- data transfer -->
+          <div *ngIf="isdata">
+            <div>
+              <input
+                class="d-input"
+                type="text"
+                placeholder="Vendor ID"
+                #vendor_id
+                style="width: 229px;"
+              />
+            </div>
+            <div>
+              <input
+                class="d-input"
+                type="text"
+                placeholder="Message ID"
+                #message_id
+                style="width: 229px;"
+              />
+            </div>
+            <div>
+              <input
+                class="d-input"
+                type="text"
+                placeholder="Data"
+                #data
+                style="width: 229px;"
+              />
+            </div>
+            <button (click)="data_func(vendor_id.value, message_id.value, data.value)" class="btn">Submit</button>
+          </div>
+          <!-- Diagnostics -->
+          <div *ngIf="isdiagVisible">
+            <div
+              class="button-container"
+              style="display: flex; flex-direction: column;"
+            >
+              <button
+                *ngFor="let status of statuses"
+                (click)="handleClick(status)"
+                class="btn"
+              >
+                {{ status }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Firmware -->
+          <div *ngIf="isfirmware">
+            <div
+              class="button-container"
+              style="display: flex; flex-direction: column;"
+            >
+              <button
+                *ngFor="let firm of firmware_status"
+                (click)="handlefirm(firm)"
+                class="btn btn-primary"
+              >
+                {{ firm }}
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Meter Values -->
+          <div *ngIf="ismetervalue">
+            <mat-form-field style="width: 230px;">
+            <mat-label>Connector ID</mat-label>
+            <mat-select (selectionChange)="onValueChange($event)">
+              <mat-option *ngFor="let value of dropdownValues" [value]="value">
+                {{ value }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+            <input
+              type="text"
+              placeholder="Meter Value"
+              class="d-input"
+              #meter_value
+              style=" width: 229px;"
+            />
+            <input
+            type="text"
+            placeholder="Transaction_id"
+            class="d-input"
+            #transaction_id
+            style="width: 229px;"
+          />
+            <button (click)="meter(transaction_id.value,meter_value.value)" class="btn">Submit</button>
+          </div>
+
+          <!-- Start Transaction -->
+          <div *ngIf="istart" >
+          <mat-form-field style="width: 230px;">
+            <mat-label>Connector ID</mat-label>
+            <mat-select (selectionChange)="Change($event)">
+              <mat-option *ngFor="let value of dropdownValues" [value]="value">
+                {{ value }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div style="margin-top: 20px;">
+            <input
+            type="text"
+            placeholder="ID Tag"
+            class="d-input"
+            #rfid
+            style="margin-top: -30px; width: 229px;"
+          />
+          </div>
+          <div style="margin-top: 10px;">
+            <input type="number"
+            placeholder="Meter Start"
+            class="d-input"
+            #meter_start
+            style="width: 229px;"
+          />
+          </div>
+
+            <button (click)="start(rfid.value, meter_start.value)" class="btn">Submit</button>
+          </div>
+
+          <!-- Status Notification -->
+          <div *ngIf="istatus" style="display: flex; flex-direction: column; gap: 10px;">
+            <mat-form-field>
+              <mat-label>Connector ID</mat-label>
+              <mat-select (selectionChange)="Changesocket($event)">
+                <mat-option *ngFor="let value of dropdownValues" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Error Code</mat-label>
+              <mat-select (selectionChange)="Changerror($event)">
+                <mat-option *ngFor="let error of errorcodes" [value]="error">
+                  {{ error }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>Status</mat-label>
+              <mat-select (selectionChange)="Changests($event)">
+                <mat-option *ngFor="let status of statusValues" [value]="status">
+                  {{ status }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+              <button (click)="statusend()" class="btn" style="width: 239px;">Submit</button>
+
+          </div>
+
+          <!-- Stop Transaction -->
+          <div *ngIf="istop">
+            <input
+            type="text"
+            placeholder="RFID"
+            class="d-input"
+            #id_tag
+            style="width: 229px;"
+          />
+            <input
+              type="text"
+              placeholder="Meter Stop"
+              class="d-input"
+              #meter_stop
+              style="width: 229px;"
+            />
+            <input
+              type="text"
+              placeholder="Transaction ID"
+              class="d-input"
+              #transaction_id
+              style="width: 229px;"
+            />
+            <button (click)="stop(id_tag.value,meter_stop.value,transaction_id.value)" class="btn">
+              Submit
+            </button>
+
+          </div>
+        </ng-container>
+      </div>
+
+      </div>
+    </mat-card>
+
+      <!-- Column 3: Request and Logs -->
+      <mat-card style="width: 700px; margin: auto; padding: 10px; height: 480px; margin-top: 15px;">
+      <div
+        class="request-logs-section"
+        style="flex: 2;  padding: 20px"
+      >
+        <h2 style="color: #00b4b4; text-decoration: overline;">Request</h2>
+        <div *ngIf="signalArray() === ''">
+            <mat-form-field appearance="fill" style="width: 650px;" >
+              <input
+                matInput
+                type="text"
+                placeholder="Request"
+                id="inp"
+                style="width: 500px; padding: auto; font-size: 16px; border-radius: 5px; "
+              />
+            </mat-form-field>
+            <div style="display: flex;">
+              <button disabled type="button" style="margin-top:10px;" class="focus:outline-none text-black bg-[#a8b3b1] hover:bg-[#a8b3b1] focus:ring-4 focus:ring-[#a8b3b1] font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-[#a8b3b1] dark:hover:bg-[#a8b3b1] dark:focus:ring-[#a8b3b1] flex items-center gap-2">
+                Send
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12M9 1l4 4-4 4"/>
+                </svg>
+              </button>
+              <button  disabled  type="button" style="margin-top:10px;" class="focus:outline-none text-black bg-[#a8b3b1] hover:bg-[#a8b3b1] focus:ring-4 focus:ring-[#a8b3b1] font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-[#a8b3b1] dark:hover:bg-[#a8b3b1] dark:focus:ring-[#a8b3b1] flex items-center gap-2">
+                Clear
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+
+
+        </div>
+        <div *ngIf="signalArray() !== ''">
+          <mat-form-field appearance="fill" style="width: 650px;" >
+          <input
+            matInput
+            type="text"
+            placeholder="Request"
+            id="inp"
+            [value]="request()"
+            #req
+            style="width: 650px; padding: auto; font-size: 16px; overflow: auto;"
+          /> </mat-form-field>
+          <div style="display: flex;">
+            <button type="button" (click)="logit(req.value)" style="margin-top:10px;" class="focus:outline-none text-white bg-[#029a9a] hover:bg-[#029a9a] focus:ring-4 focus:ring-[#029a9a] font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-[#029a9a] dark:hover:bg-[#029a9a] dark:focus:ring-[#029a9a] flex items-center gap-2">
+              Send
+              <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12M9 1l4 4-4 4"/>
+              </svg>
+            </button>
+            <button type="button" (click)="clear()" style="margin-top:10px;" class="focus:outline-none text-white bg-[#029a9a] hover:bg-[#029a9a] focus:ring-4 focus:ring-[#029a9a] font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-[#029a9a] dark:hover:bg-[#029a9a] dark:focus:ring-[#029a9a] flex items-center gap-2">
+              Clear
+              <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+        <h2 style="color: #00b4b4; text-decoration: overline; margin-top: 30px;">Logs</h2>
+        <div class="scroll">
+          <div *ngFor="let item of logsList" style="padding: 5px 0; overflow-y:auto">
+            {{ item }}
+        </div>
+        </div>
+      </div>
+    </mat-card>
+    </div>
+  </div>
+
+  <!-- Server Request Side -->
+   <div class="main" *ngIf="Server" style="display: flex; overflow: hidden;">
+      <div class="request-controls">
+        <mat-card style="max-width: 700px; margin: auto; padding: 10px; margin-top: 15px; height:490px; margin-left: 49px;">
+          <div class="controls-section" style="flex: 1; padding: 15px">
+            <h2 style="color: #00b4b4; text-decoration: overline;">Controls</h2>
+            <ul style="list-style: none; padding: 0; display: flex; gap: 10px;">
+              <div>
+                <li>
+                  <button (click)="server_request('Cancel Reservation')" mat-fab extended style="height: 30px; background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px;">Cancel Reservation</button></li>
+                <li><button  (click)="server_request('Change Availability')"mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Change Availability</button></li>
+                <li><button  (click)="server_request('Change Configuration')" mat-fab extended style="height: 35px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Change Configuration</button></li>
+                <li><button  (click)="server_request('Clear Cache')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Clear Cache</button></li>
+                <li><button  (click)="server_request('Clear Charging Profile')" mat-fab extended style="height: 35px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Clear Charging Profile</button></li>
+                <li><button  (click)="server_request('Data Transfer')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Data Transfer</button></li>
+                <li><button  (click)="server_request('Get Composite Schedule')" mat-fab extended style="height: 35px;    background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Get Composite Schedule</button></li>
+                <li><button  (click)="server_request('Get Configuration')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Get Configuration</button></li>
+                <li><button  (click)="server_request('Get Diagnostics')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Get Diagnostics</button></li>
+                <li><button  (click)="server_request('Get Local List Version')" mat-fab extended style="height: 35px;    background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px; ">Get Local List Version</button></li>
+              </div>
+              <div style="margin-top: -5px;">
+              <li><button  (click)="server_request('Remote Start Transaction')" mat-fab extended style="height: 35px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px;">Remote Start Transaction</button></li>
+              <li><button  (click)="server_request('Remote Stop Transaction')" mat-fab extended style="height: 35px;   background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Remote Stop Transaction</button></li>
+              <li><button  (click)="server_request('Reserve Now')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Reserve Now</button></li>
+              <li><button  (click)="server_request('Reset')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Reset</button></li>
+              <li><button  (click)="server_request('Send Local List')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Send Local List</button></li>
+              <li><button  (click)="server_request('Set Charging Profile')" mat-fab extended style="height: 35px;    background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Set Charging Profile</button></li>
+              <li><button  (click)="server_request('Trigger Message')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Trigger Message</button></li>
+              <li><button  (click)="server_request('Unlock Connector')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Unlock Connector</button></li>
+              <li><button  (click)="server_request('Update Firmware')" mat-fab extended style="height: 30px;  background-color: #cdffff; color: #009c9c; width: 200px; font-size: 15px; margin-top: 10px;">Update Firmware</button></li>
+              </div>
+
+              </ul>
+              </div>
+              </mat-card>
+      </div>
+
+
+      <div class="req" style="width: 350px; padding: 15px; margin-left: 15px; margin-top: -10px;">
+        <mat-card class="req-card">
+          <h2 class="response-title" *ngIf="response() === ''">Response</h2>
+          <h2 class="response-title" *ngIf="response() !== ''">{{ response() }}</h2>
+
+          <div *ngIf="cancelreservation" style="display: block;">
+            <mat-button-toggle-group
+              name="fontStyle"
+              class="toggle-group"
+              aria-label="Font Style"
+              [formControl]="selectedToggle1">
+              <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+              <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+            </mat-button-toggle-group>
+            <div>
+            <button class="btn"  style="width: 212px;" (click)="cancel_reserve()">Send Response</button>
+            </div>
+          </div>
+
+          <div *ngIf="changeavailability">
+            <mat-form-field>
+              <mat-label>Availability Response</mat-label>
+              <mat-select (selectionChange)="change($event)">
+                <mat-option *ngFor="let value of Avaialability" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button class="btn" style="width: 212px;" (click)="changeavailabilityreq()">Send Reponse</button>
+          </div>
+
+          <div *ngIf="changeconfigs">
+            <mat-form-field>
+              <mat-label>Configuration Response</mat-label>
+              <mat-select (selectionChange)="changeconfig($event)">
+                <mat-option *ngFor="let value of configurations" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button class="btn" style="width: 212px;" (click)="change_config()">Send Response</button>
+          </div>
+
+          <div *ngIf="clearcache">
+            <mat-button-toggle-group
+              name="fontStyle"
+              class="toggle-group"
+              aria-label="Font Style"
+              [formControl]="selectedToggle1">
+              <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+              <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+            </mat-button-toggle-group>
+            <button class="btn" style="width: 212px;"  (click)="clear_cache()">Send Response</button>
+          </div>
+
+          <div *ngIf="clearchargingprofile">
+            <mat-form-field>
+              <mat-label>Clear Charging Profile</mat-label>
+              <mat-select (selectionChange)="clearprofile($event)">
+                <mat-option *ngFor="let value of cache" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button class="btn" style="width: 212px;" (click)="clearchargingprofile_submit()">Send Response</button>
+          </div>
+
+
+        <div *ngIf="datatransfer" style="display: block;">
+          <mat-form-field>
+            <mat-label>Data Transfer</mat-label>
+            <mat-select (selectionChange)="datatransfer_status($event)">
+              <mat-option *ngFor="let value of datatransferid" [value]="value">
+                {{ value }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div style="margin-top: 10px;">
+          <textarea matInput placeholder="Data(Optional)" style="background-color: #e7ecec; width: 215px; padding: 5px 5px;" #data_text></textarea>
+          </div>
+          <button class="btn" style="width: 212px;"  (click)="datatransfer_submit(data_text.value)">Send Response</button>
+        </div>
+
+
+        <div *ngIf="composite">
+          <mat-button-toggle-group
+            name="fontStyle"
+            class="toggle-group"
+            aria-label="Font Style"
+            [formControl]="selectedToggle1">
+            <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+            <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+          </mat-button-toggle-group>
+          <button class="btn" style="width: 212px;"  (click)="composite_schedule()">Send Response</button>
+        </div>
+
+
+
+
+
+        <div *ngIf="localist" style="display: block; width: 250px;">
+          <mat-form-field style="display: block; width: 250px;">
+            <input
+              matInput
+              type="text"
+              placeholder="List Version"
+              #list
+              style="width: 212px;"
+            />
+          </mat-form-field>
+          <button class="btn" style="width: 250px;" (click)="getlist(list.value)">Send Response</button>
+        </div>
+
+        <div *ngIf="remote_start">
+          <mat-button-toggle-group
+            name="fontStyle"
+            class="toggle-group"
+            aria-label="Font Style"
+            [formControl]="selectedToggle1">
+            <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+            <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+          </mat-button-toggle-group>
+          <button class="btn" style="width: 212px;" (click)="remote_startfunc()">Send Response</button>
+        </div>
+
+        <div *ngIf="remote_stop">
+          <mat-button-toggle-group
+            name="fontStyle"
+            class="toggle-group"
+            aria-label="Font Style"
+            [formControl]="selectedToggle1">
+            <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+            <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+          </mat-button-toggle-group>
+          <button class="btn" style="width: 212px;" (click)="remote_startfunc()">Send Response</button>
+        </div>
+
+
+
+        <div *ngIf="reservation" style="display: block;">
+          <mat-form-field>
+            <mat-label>Reserve Now</mat-label>
+            <mat-select (selectionChange)="reserve($event)">
+              <mat-option *ngFor="let value of reservationstatus" [value]="value">
+                {{ value }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button class="btn" style="width: 215px;" (click)="reservenow()">Send Response</button>
+        </div>
+
+        <div *ngIf="reset_status" style="display: block;">
+          <mat-button-toggle-group
+            name="fontStyle"
+            class="toggle-group"
+            aria-label="Font Style"
+            [formControl]="selectedToggle1">
+            <mat-button-toggle value="Accepted">Accepted</mat-button-toggle>
+            <mat-button-toggle value="Rejected">Rejected</mat-button-toggle>
+          </mat-button-toggle-group>
+          <div>
+          <button class="btn" style="width: 212px;" (click)="reset()">Send Response</button>
+          </div>
+        </div>"
+
+        <div *ngIf="sendlist" style="display: block;">
+          <mat-form-field>
+          <mat-label>LocalList Status</mat-label>
+          <mat-select (selectionChange)="localist_state($event)">
+            <mat-option *ngFor="let value of sendlist_status" [value]="value">
+              {{ value }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button class="btn" style="width: 212px;" (click)="locallist_submit()">Send Response</button>
+          </div>
+
+          <div *ngIf="chargingprofile" style="display: block;">
+            <mat-form-field>
+              <mat-label>Charging Profile</mat-label>
+              <mat-select (selectionChange)="setchargingprofile($event)">
+                <mat-option *ngFor="let value of chargingprofile_status" [value]="value">
+                  {{ value }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button class="btn" style="width:210px" (click)="setcharging_submit()">Send Response</button>
+            </div>
+
+            <div *ngIf="triggermessage" style="display: block;">
+              <mat-form-field>
+                <mat-label>Trigger</mat-label>
+                <mat-select (selectionChange)="trigger($event)">
+                  <mat-option *ngFor="let value of trigger_status" [value]="value">
+                    {{ value }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button class="btn" style="width: 211px;" (click)="trigger_submit()">Send Response</button>
+              </div>
+
+              <div *ngIf="unlockstatus" style="display: block;">
+                <mat-form-field>
+                  <mat-label>Unlock Connector</mat-label>
+                  <mat-select (selectionChange)="unlock($event)">
+                    <mat-option *ngFor="let value of unlock_status" [value]="value">
+                      {{ value }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button class="btn" style="width: 211px;" (click)="unlock_submit()">Send Response</button>
+                </div>
+
+
+
+
+      </mat-card>
+
+      </div>
+
+
+      <div class="req"  style="width:600px; padding: 15px; height:490px;" >
+        <mat-card style="width: 600px; padding: 10px; height:490px; margin-top: -1px; margin-right: 0px; margin-left: -70px;">
+          <div class="controls-section" style="flex: 1; padding: 15px">
+          <h2 style="color: #00b4b4; text-decoration: overline;">Request</h2>
+          <div style="  width: 100%;
+          height: 400px;
+          overflow: hidden;
+          overflow-y: auto;
+          padding: 10px;
+          background-color: #d9fbfb;" >
+            <div *ngFor="let item of ReqsList" style="padding: 5px 0;">
+               <p>{{item}}</p>
+            </div>
+          </div>
+        </div>
+        </mat-card>
+      </div>
+
+   </div>
+
+
+
+
+
+
