@@ -33,8 +33,6 @@ Here are some of the key commands supported by the tool:
 
 ## Screenshots
 
-![App Screenshot](assets/image1.png)
-![App Screenshot](assets/image2.png)
 ![App Screenshot](assets/image3.png)
 ![App Screenshot](assets/image4.png)
 
